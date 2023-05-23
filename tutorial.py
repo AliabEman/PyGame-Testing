@@ -21,7 +21,7 @@ FONT = pygame.font.SysFont("comicsans", 16)
 
 # Implementing the planets:
 class Planet:
-    # Constants to use in the simulation
+    # Constants to use in the simulation:
 
     # Astronomical Unit, approx equal to the distance from the Earth to the Sun:
     # 1 AU = 149.6e6 * 1000 m from the sun
@@ -34,8 +34,6 @@ class Planet:
     # How much time do we want to represent as being elapsed in our simulation, TIMESTEP
     TIMESTEP = 3600* 24 # Representing one day at a time updating the planet.
 
-
-    
     # Define the initialization of the planets, with their dimensions for the game
     def __init__(self, x, y, radius, color, mass):
         # Position of planet on the screen in m
@@ -46,7 +44,7 @@ class Planet:
         # Mass in kg of the planet, used to calculate the attraction between planets for circular orbit
         self.mass = mass
         
-        # Used to keep track of all the points this planet has travelled on, so we can draw a circular orbit representing
+        # This list is used to keep track of all the points this planet has travelled on, so we can draw a circular orbit representing
         # the orbit of the planet
         self.orbit = []
 
@@ -58,13 +56,13 @@ class Planet:
         self.distance_to_sun = 0 
         # Velocity for the movement of the planets in the game.
         # We can generate a circle by having the x,y velocities moving at a constant speed,
-        # makes a circular design, in m
+        # makes a circular design, in meters
         self.x_vel = 0
         self.y_vel = 0
 
     # We need to draw the planet
     def draw(self, win):
-        # bring the values to scale
+        # bring the values to scale of the window
         x = self.x * self.SCALE + WIDTH / 2
         y = self.y * self.SCALE + HEIGHT / 2
 
@@ -82,13 +80,12 @@ class Planet:
         # draw the circle on the window (win), with the color, position (x,y) and radius
         pygame.draw.circle(win, self.color, (x,y), self.radius)
 
-        # Create the text object to get the distance at any given point
+        # Create the text object to get the distance at any given point for the planets orbiting the sun
         if not self.sun:
             distance_text = FONT.render(f"{round(self.distance_to_sun/1000, 1)}km", 1, WHITE)
             WIN.blit(distance_text, (x - distance_text.get_width()/2,y - distance_text.get_height()/2))
 
-    # Method to calculate the force of attraction between another object
-    # and the current object
+    # Method to calculate the force of attraction between another object and the current object
     def attraction(self, other):
         other_x, other_y = other.x, other.y
         # calculate the distance between the two objects
@@ -97,16 +94,14 @@ class Planet:
 
         distance = math.sqrt(distance_x **2 + distance_y ** 2)
 
+        # If the object being calculated for the distance from the sun IS the sun, we update the distance of the sun
         if other.sun:
-            # If the object being calculated for the distance from the sun
-            # IS the sun, we calculate the distance to the sun
             self.distance_to_sun = distance
 
         # Calculate the force of attraction
         force = self.G * self.mass * other.mass / distance**2
 
-        # this method, math.atan2 can find the angle for theta between
-        # y and x distance
+        # this method, math.atan2 can find the angle for theta between y and x distance
         theta = math.atan2(distance_y, distance_x)
 
         # Force components
@@ -114,15 +109,12 @@ class Planet:
         force_y = math.sin(theta) * force
         return force_x, force_y
         
-    # method to update the position according to the current
-    # and other planet
+    # method to update the position according to the current and other planet
     def update_position(self, planets):
-        # Get the total forces exerted on the current planet that are not
-        # the current planet
+        # Get the total forces exerted on the current planet that are not the current planet
         total_fx = total_fy = 0
         for planet in planets:
-            # we arent looking to calculate the force between the current
-            # planet and the current planet
+            # we arent looking to calculate the force between the current planet and the current planet
             if self == planet:
                 continue
             # calculate the force exerted on the current planet
@@ -136,8 +128,7 @@ class Planet:
         # Update the x, y position using the velocity and timestamp
         self.x += self.x_vel * self.TIMESTEP
         self.y += self.y_vel * self.TIMESTEP
-        # Append the x and y position to draw the orbit 
-        # around the current planet.
+        # Append the x and y position to draw the orbit around the current planet.
         self.orbit.append((self.x, self.y))
 
 # Set the Pygame Event Loop, an infinite loop which runs the entire time the simulation is going 
@@ -174,14 +165,15 @@ def main():
     while run:
         # we allow our game to run our clock at a maximum of 60 frames per second.
         clock.tick(60)
-        # We need to refresh the screen, in order to see in stop-motion
+        # We need to "refresh the screen" by setting the window to black repeatedly, in order to see changes in stop-motion
+        # and no drag of our moving objects
         WIN.fill((0,0,0))
 
         # Get the different events occuring in the pygame
         # Key presses, mouse clicks, etc
         # The more advanced the game, the more events that get handled
         for event in pygame.event.get():
-            # We handle if the event window is exited w/ the x button in the window.
+            # We handle if the event window is exited w/ the x button.
             if event.type == pygame.QUIT:
                 run = False
             # To display a drawing action (multipart):
